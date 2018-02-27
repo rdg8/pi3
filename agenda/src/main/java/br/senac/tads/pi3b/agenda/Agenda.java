@@ -8,8 +8,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,22 +26,27 @@ public class Agenda {
         return conn;
     }
 
-    public void listar() throws ClassNotFoundException, SQLException {
+    public List<Pessoa> listar() throws ClassNotFoundException, SQLException {
 
+        List<Pessoa> lista = new ArrayList<Pessoa>();
         try (Connection conn = obterConexao();
                 PreparedStatement stmt = conn.prepareStatement(
                         "SELECT id, nome, dtnacimento FROM PESSOA");
                 ResultSet resultados = stmt.executeQuery();) {
-
             while (resultados.next()) {
                 long id = resultados.getLong("id");
                 String nome = resultados.getString("nome");
                 Date dtnacimento = resultados.getDate("dtnacimento");
-
-                System.out.println(id + ", " + nome + ", " + dtnacimento);
+                Pessoa p =new Pessoa();
+                p.setId(id);
+                p.setNome(nome);
+                p.setDtNascimento(dtnacimento);
+                lista.add(p);
+                //System.out.println(id + ", " + nome + ", " + dtnacimento);
             }
         } finally {
         }
+        return lista;
     }
 
     public void incluir() throws ClassNotFoundException, SQLException {
@@ -61,8 +68,12 @@ public class Agenda {
         Agenda agenda = new Agenda();
 
         try {
-            //agenda.incluir();
-            agenda.listar();
+            agenda.incluir();
+            //agenda.listar();
+            List<Pessoa> p = new ArrayList<Pessoa>();
+            for (int i = 0; i < 10; i++) {
+                
+            }
         } catch (ClassNotFoundException ex) {
             System.err.println(ex.getMessage());
         } catch (SQLException ex) {
