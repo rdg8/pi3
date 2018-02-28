@@ -3,6 +3,7 @@
  */
 package br.senac.tads.pi3b.agenda;
 
+import com.mysql.jdbc.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -50,16 +51,29 @@ public class Agenda {
     }
 
     public void incluir() throws ClassNotFoundException, SQLException {
-        try (Connection conn = obterConexao();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "INSERT INTO PESSOA (nome, dtnacimento) VALUES(?, ?)")) {
+        try (Connection conn = obterConexao()){
+                conn.setAutoCommit(false);
+                
+                try(PreparedStatement stmt =
+                        conn.prepareStatement(
+                        "INSERT INTO PESSOA (nome, dtnacimento) VALUES(?, ?)"),
+                        Statement.RETURN_GENERATED_KEYS)) 
+                    {
             stmt.setString(1, "maria de souza");
             GregorianCalendar cal = new GregorianCalendar(1992, 10, 5);
             stmt.setDate(2, new java.sql.Date(cal.getTimeInMillis()));
 
             int status = stmt.executeUpdate();
-            System.out.println("Status: " + status);
-        } finally {
+            //recupera o id gerado peolo BD
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if(generatedKeys.next()){
+                long idPessoa = generatedKeys.getLong(1);
+                
+                try (PreparedStatement stmt2 = conn.prepareStatement("INSERT INTO CONTATO (tipo, valor, idpessoa) values (?, ?, ?)"))
+            }
+            
+            } 
+        }finally {
 
         }
     }
